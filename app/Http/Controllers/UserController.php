@@ -4,21 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController as ResponseController;
-
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Auth\Events\Attempting;
+use app\Models\User;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\Validator;
-use Laravel\Passport\Passport;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+
+
 
 
 
 
 class UserController extends ResponseController
 {
-  
+ 
+     
 
     public function register(Request $request)
 
@@ -67,43 +67,30 @@ class UserController extends ResponseController
 
     }
 
-
-
-
     public function login(Request $request){
+
         $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
+            'username' => ['required', 'username'],
+            'password' => ['required']
         ]);
 
-        $credentials = request(['username', 'password']);
+        $user = User::where('username', $request->username)->first();
 
-        if (!Auth::attempt($credentials))
-            return $this->sendError($credentials, "Error al Logear", 402);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'username' => ['Usuario Incorrecto']
+            ]);
+        }
 
-
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-
-        $token = $tokenResult->token;
-        $token->save();
-
-        return response()->json([
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer'
-        ]);
-
-    }
-
-
-
-    public function showUser(){
-        $user = User::get();
-        return $user;
-    }
-
-
-    
-
-
+        return $user->createToken('Token-Autorizacion')->accessToken;
+     }
+ 
+ 
+ 
+     public function showUser(){
+         $user = User::get();
+         return $user;
+     }
+ 
+ 
 }
