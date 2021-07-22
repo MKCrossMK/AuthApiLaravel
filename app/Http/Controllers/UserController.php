@@ -57,7 +57,7 @@ class UserController extends ResponseController
 
         $user = User::create($input);
 
-        $success['token'] =  $user->createToken('MyApp')->accessToken;
+        $success['token'] =  $user->createToken('Token-Autorizacion')->accessToken;
 
         $success['name'] =  $user->name;
 
