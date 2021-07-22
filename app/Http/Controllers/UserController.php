@@ -70,11 +70,11 @@ class UserController extends ResponseController
     public function login(Request $request){
 
         $request->validate([
-            'username' => ['required', 'username'],
+            'email' => ['required', 'email'],
             'password' => ['required']
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('email', $request->username)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
