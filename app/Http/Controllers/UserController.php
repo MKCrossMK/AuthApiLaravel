@@ -88,7 +88,7 @@ class UserController extends ResponseController
  
  
      public function showUser(){
-         $user = User::get();
+         $user = User::all();
          return $user;
      }
  
